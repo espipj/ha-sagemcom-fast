@@ -1,6 +1,6 @@
 """Config flow for Sagemcom integration."""
 
-from aiohttp import ClientError
+from aiohttp import ClientError, CookieJar
 from homeassistant import config_entries
 from homeassistant.const import (
     CONF_HOST,
@@ -10,7 +10,7 @@ from homeassistant.const import (
     CONF_VERIFY_SSL,
 )
 from homeassistant.core import callback
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers import aiohttp_client
 from sagemcom_api.client import SagemcomClient
 from sagemcom_api.enums import ApiMode
 from sagemcom_api.exceptions import (
@@ -43,7 +43,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._host = user_input[CONF_HOST]
         ssl = user_input[CONF_SSL]
 
-        session = async_get_clientsession(self.hass, user_input[CONF_VERIFY_SSL])
+        session = aiohttp_client.async_create_clientsession(
+            self.hass,
+            verify_ssl=user_input[CONF_VERIFY_SSL],
+            cookie_jar=CookieJar(unsafe=True),
+        )
 
         client = SagemcomClient(
             host=self._host,
@@ -54,13 +58,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             ssl=ssl,
         )
 
-        user_input[CONF_ENCRYPTION_METHOD] = await client.get_encryption_method()
-        LOGGER.debug(
-            "Detected encryption method: %s", user_input[CONF_ENCRYPTION_METHOD]
-        )
+        try:
+            user_input[CONF_ENCRYPTION_METHOD] = await client.get_encryption_method()
+            LOGGER.debug(
+                "Detected encryption method: %s", user_input[CONF_ENCRYPTION_METHOD]
+            )
 
-        await client.login()
-        await client.logout()
+            await client.login()
+            await client.logout()
+        finally:
+            await client.close()
 
         return self.async_create_entry(
             title=self._host,
