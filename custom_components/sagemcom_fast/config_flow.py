@@ -63,13 +63,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             "Detected encryption method: %s", user_input[CONF_ENCRYPTION_METHOD]
         )
 
-        await client.login()
-        await client.logout()
+        responseLogin = await client.login()
+        LOGGER.debug("Login response: %s", responseLogin)
+        responseLogout = await client.logout()
+        LOGGER.debug("Logout response: %s", responseLogout)
 
-        return self.async_create_entry(
+        entry_result = self.async_create_entry(
             title=self._host,
             data=user_input,
         )
+        LOGGER.debug("Create entry response: %s", entry_result)
+        return entry_result
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
