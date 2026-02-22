@@ -58,16 +58,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             ssl=ssl,
         )
 
-        try:
-            user_input[CONF_ENCRYPTION_METHOD] = await client.get_encryption_method()
-            LOGGER.debug(
-                "Detected encryption method: %s", user_input[CONF_ENCRYPTION_METHOD]
-            )
+        user_input[CONF_ENCRYPTION_METHOD] = await client.get_encryption_method()
+        LOGGER.debug(
+            "Detected encryption method: %s", user_input[CONF_ENCRYPTION_METHOD]
+        )
 
-            await client.login()
-            await client.logout()
-        finally:
-            await client.close()
+        await client.login()
+        await client.logout()
 
         return self.async_create_entry(
             title=self._host,
