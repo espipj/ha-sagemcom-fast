@@ -1,5 +1,7 @@
 """Config flow for Sagemcom integration."""
 
+from importlib.metadata import PackageNotFoundError, version
+
 from aiohttp import ClientError, CookieJar
 from homeassistant import config_entries
 from homeassistant.const import (
@@ -27,6 +29,14 @@ from .const import CONF_ENCRYPTION_METHOD, DOMAIN, LOGGER
 from .options_flow import OptionsFlow
 
 
+def _get_package_version(package_name: str) -> str:
+    """Return installed package version or unknown."""
+    try:
+        return version(package_name)
+    except PackageNotFoundError:
+        return "unknown"
+
+
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Sagemcom."""
 
@@ -38,6 +48,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_validate_input(self, user_input):
         """Validate user credentials."""
+        LOGGER.debug(
+            "Installed versions - sagemcom_api: %s, homeassistant: %s",
+            _get_package_version("sagemcom_api"),
+            _get_package_version("homeassistant"),
+        )
+
         self._username = user_input.get(CONF_USERNAME) or ""
         password = user_input.get(CONF_PASSWORD) or ""
         self._host = user_input[CONF_HOST]
