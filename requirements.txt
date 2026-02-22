@@ -1,1 +1,1 @@
-sagemcom_api==1.4.3
+git+https://github.com/espipj/python-sagemcom-api.git@feat/new-API-support#egg=sagemcom_api
