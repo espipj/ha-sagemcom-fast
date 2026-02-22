@@ -69,7 +69,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         username=username,
         password=password,
         authentication_method=EncryptionMethod(encryption_method),
-        api_mode=ApiMode.AUTO,
+        api_mode=ApiMode.REST,
         session=session,
         ssl=ssl,
     )

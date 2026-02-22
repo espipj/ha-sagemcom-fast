@@ -69,7 +69,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             host=self._host,
             username=self._username,
             password=password,
-            api_mode=ApiMode.AUTO,
+            api_mode=ApiMode.REST,
             session=session,
             ssl=ssl,
         )
