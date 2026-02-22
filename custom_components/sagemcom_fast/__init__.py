@@ -20,7 +20,7 @@ from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import aiohttp_client, device_registry
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from sagemcom_api.client import SagemcomClient
-from sagemcom_api.enums import EncryptionMethod
+from sagemcom_api.enums import ApiMode, EncryptionMethod
 from sagemcom_api.exceptions import (
     AccessRestrictionException,
     AuthenticationException,
@@ -63,6 +63,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         username=username,
         password=password,
         authentication_method=EncryptionMethod(encryption_method),
+        api_mode=ApiMode.AUTO,
         session=session,
         ssl=ssl,
     )

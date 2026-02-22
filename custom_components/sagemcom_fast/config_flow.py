@@ -12,6 +12,7 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from sagemcom_api.client import SagemcomClient
+from sagemcom_api.enums import ApiMode
 from sagemcom_api.exceptions import (
     AccessRestrictionException,
     AuthenticationException,
@@ -48,6 +49,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             host=self._host,
             username=self._username,
             password=password,
+            api_mode=ApiMode.AUTO,
             session=session,
             ssl=ssl,
         )
