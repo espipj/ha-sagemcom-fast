@@ -10,7 +10,7 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/imicknl/ha-sagemcom-fast/issues",
   "requirements": [
-    "sagemcom_api @ git+https://github.com/espipj/python-sagemcom-api.git@27a4a135f4c5394fa4c80b963b1a8fe97a3ae3f7"
+    "sagemcom_api @ git+https://github.com/espipj/python-sagemcom-api.git@6698f42241fba25a6329d7f21ffcaf5bb56da510"
   ],
   "ssdp": [
     {
