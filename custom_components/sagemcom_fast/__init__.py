@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import timedelta
 
-from aiohttp import ClientSession, CookieJar
+from aiohttp import CookieJar
 from aiohttp.client_exceptions import ClientError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -47,7 +47,6 @@ class HomeAssistantSagemcomFastData:
 
     coordinator: SagemcomDataUpdateCoordinator
     gateway: GatewayDeviceInfo
-    client_session: ClientSession
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
@@ -77,29 +76,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     try:
         await client.login()
     except AccessRestrictionException as exception:
-        await client.close()
         LOGGER.error("Access restricted")
         raise ConfigEntryAuthFailed("Access restricted") from exception
     except (AuthenticationException, UnauthorizedException) as exception:
-        await client.close()
         LOGGER.error("Invalid_auth")
         raise ConfigEntryAuthFailed("Invalid credentials") from exception
     except (TimeoutError, ClientError, ConnectionError) as exception:
-        await client.close()
         LOGGER.error("Failed to connect")
         raise ConfigEntryNotReady("Failed to connect") from exception
     except MaximumSessionCountException as exception:
-        await client.close()
         LOGGER.error("Maximum session count reached")
         raise ConfigEntryNotReady("Maximum session count reached") from exception
     except LoginRetryErrorException as exception:
-        await client.close()
         LOGGER.error("Too many login attempts. Retry later.")
         raise ConfigEntryNotReady(
             "Too many login attempts. Retry later."
         ) from exception
     except Exception as exception:  # pylint: disable=broad-except
-        await client.close()
         LOGGER.exception(exception)
         return False
 
@@ -119,7 +112,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = HomeAssistantSagemcomFastData(
-        coordinator=coordinator, gateway=gateway, client_session=session
+        coordinator=coordinator, gateway=gateway
     )
 
     # Create gateway device in Home Assistant
@@ -147,8 +140,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
-        data: HomeAssistantSagemcomFastData = hass.data[DOMAIN].pop(entry.entry_id)
-        await data.client_session.close()
+        hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
 
