@@ -1,1 +1,1 @@
-sagemcom_api @ git+https://github.com/espipj/python-sagemcom-api.git@6698f42241fba25a6329d7f21ffcaf5bb56da510
+sagemcom_api @ git+https://github.com/espipj/python-sagemcom-api.git@f1fbae7a1957a97aadd342de415ed848217cb978
